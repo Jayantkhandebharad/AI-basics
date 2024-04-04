@@ -1,22 +1,21 @@
-import requests
-import time
+from openai import AzureOpenAI
+import json
+api_base = ''  # Enter your endpoint here
+api_key = ''        # Enter your API key here
+# Note: DALL-E 3 requires version 1.0.0 of the openai-python library or later
 import os
-api_base = '<your_endpoint>'  # Enter your endpoint here
-api_key = '<your_key>'        # Enter your API key here
 
-api_version = '2024-02-01'
-url = f"{api_base}/openai/deployments/<dalle3>/images/generations?api-version={api_version}"
-headers= { "api-key": api_key, "Content-Type": "application/json" }
-body = {
-    # Enter your prompt text here
-    "prompt": "A multi-colored umbrella on the beach, disposable camera",
-    "size": "1024x1024", # supported values are “1792x1024”, “1024x1024” and “1024x1792” 
-    "n": 1, #The number of images to generate. Only n=1 is supported for DALL-E 3.
-    "quality": "hd", # Options are “hd” and “standard”; defaults to standard 
-    "style": "vivid" # Options are “natural” and “vivid”; defaults to “vivid”
-}
-submission = requests.post(url, headers=headers, json=body)
+client = AzureOpenAI(
+    api_version="2024-02-01",
+    azure_endpoint=api_base,
+    api_key=api_key
+)
 
-image_url = submission.json()['data'][0]['url']
+result = client.images.generate(
+    model="Dalle3", # the name of your DALL-E 3 deployment
+    prompt="robotic theam with black background and cloudlex written on it",
+    n=1
+)
 
+image_url = json.loads(result.model_dump_json())['data'][0]['url']
 print(image_url)
